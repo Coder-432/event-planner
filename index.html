@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gather: plan your event</title>
+<meta name="description" content="Fill in the blanks and get a budget, timeline, vendor checklist and ideas for your birthday or community event.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#EDE9FE; --paper-2:#F8F6FF; --ink:#1B1340; --ink-2:#4A4270;
+    --pink:#FF8FB5; --hot:#FF4F8B; --sun:#FFD25A; --mint:#6FE3C1; --sky:#8FB0FF;
+    --lilac:#C9B8FF; --peach:#FFB48A; --lime:#C8EE6B; --aqua:#7FD8F0;
+    --font:"Bricolage Grotesque", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *, *::before, *::after { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  html { color-scheme:light; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--font); font-optical-sizing:auto;
+         font-size:1.0625rem; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1120px; margin:0 auto; padding-inline:clamp(20px,5vw,48px); }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  :focus-visible { outline:3px solid var(--ink); outline-offset:3px; border-radius:6px; }
+
+  /* Header */
+  .top { padding-block:22px 0; }
+  .brand { font-weight:800; font-stretch:80%; font-size:1.6rem; letter-spacing:-.02em; }
+
+  /* The sentence */
+  .intro { padding-block:clamp(36px,7vw,84px) 0; }
+  .lede { margin:0 0 22px; max-width:46ch; color:var(--ink-2); font-size:1.1rem; }
+  .sentence { margin:0; font-size:clamp(1.65rem, 1rem + 3.4vw, 3.7rem); line-height:1.5; font-weight:700;
+              font-stretch:88%; letter-spacing:-.025em; text-wrap:pretty; }
+  .fill { position:relative; display:inline-grid; vertical-align:baseline; background:var(--c); border-radius:.34em;
+          padding:0 .3em; margin-block:.04em; cursor:text; }
+  .fill > * { grid-area:1 / 1; min-width:0; }
+  .fill .mirror { visibility:hidden; white-space:pre; pointer-events:none; }
+  .fill input, .fill select { width:0; min-width:100%; font:inherit; letter-spacing:inherit; color:inherit; background:none; border:0;
+                               padding:0; margin:0; outline:0; appearance:none; -moz-appearance:textfield; text-align:left; }
+  .fill input::-webkit-outer-spin-button, .fill input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+  .fill input::placeholder { color:rgba(27,19,64,.62); opacity:1; }
+  .fill:focus-within { outline:3px solid var(--ink); outline-offset:3px; }
+  .fill.pick { cursor:pointer; padding-right:.85em; }
+  .fill.pick::after { content:""; position:absolute; right:.28em; top:50%; margin-top:-.08em; border:.2em solid transparent;
+                      border-top-color:var(--ink); pointer-events:none; }
+  .fill.pick select { cursor:pointer; }
+  .fill.date input { cursor:pointer; color-scheme:light; }
+  .fill.date .mirror { padding-right:1.5em; }
+  .f1 { --c:var(--pink); } .f2 { --c:var(--sun); } .f3 { --c:var(--mint); } .f4 { --c:var(--sky); } .f5 { --c:var(--lilac); }
+  .f6 { --c:var(--peach); }
+  /* Secondary blank (currency): same behavior, quieter size so long names fit */
+  .fill.small { font-size:.46em; letter-spacing:0; font-weight:700; vertical-align:.34em; border-radius:.55em; padding-left:.55em; padding-right:1.25em; }
+  .plain { color:var(--ink); }
+  .nowrap { white-space:nowrap; }
+
+  /* Details */
+  .details { margin-top:clamp(28px,5vw,48px); display:grid; gap:18px 28px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+             max-width:860px; }
+  .field { display:flex; flex-direction:column; gap:6px; font-size:.95rem; font-weight:600; }
+  .field input[type=text], .field input[type=number], .field textarea {
+    font:inherit; font-weight:500; color:var(--ink); background:var(--paper-2); border:2px solid var(--ink);
+    border-radius:12px; padding:11px 13px; width:100%; }
+  .field textarea { resize:vertical; min-height:84px; }
+  .field input::placeholder, .field textarea::placeholder { color:#6B6390; }
+  .field input:focus-visible, .field textarea:focus-visible { outline:3px solid var(--ink); outline-offset:2px; }
+  .field.wide { grid-column:1 / -1; }
+  .seg3 { display:flex; flex-direction:row; gap:8px; flex-wrap:wrap; align-items:center; border:0; padding:0; margin:0; }
+  .seg3 legend { float:left; width:100%; padding:0; margin-bottom:6px; font-size:.95rem; font-weight:600; }
+  .seg3 label { position:relative; }
+  .seg3 input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
+  .seg3 span { display:inline-block; padding:9px 16px; border:2px solid var(--ink); border-radius:999px; font-weight:600;
+               background:var(--paper-2); }
+  .seg3 input:checked + span { background:var(--ink); color:var(--paper); }
+  .seg3 input:focus-visible + span { outline:3px solid var(--ink); outline-offset:3px; }
+
+  .go-row { margin-top:30px; display:flex; flex-wrap:wrap; align-items:center; gap:14px 20px; }
+  .btn { font:inherit; font-weight:700; cursor:pointer; border-radius:999px; border:2px solid var(--ink); padding:12px 22px;
+         background:var(--paper-2); color:var(--ink); transition:background .15s, color .15s; }
+  .btn:hover { background:var(--sun); }
+  .btn.go { font-size:1.2rem; padding:16px 32px; background:var(--ink); color:var(--paper); }
+  .btn.go:hover { background:var(--hot); color:var(--ink); }
+  .btn:disabled { opacity:.65; cursor:progress; }
+  .err { margin:0; font-weight:600; color:#9A1236; max-width:60ch; flex-basis:100%; }
+  .status { margin:0; font-weight:600; color:var(--ink-2); max-width:60ch; flex-basis:100%; }
+
+  /* Results */
+  #results { padding-block:clamp(44px,8vw,96px) 40px; }
+  .lead { display:grid; gap:32px 48px; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); align-items:start; }
+  .mode { margin:0 0 14px; display:inline-block; padding:4px 12px; border-radius:999px; background:var(--lilac); font-size:.88rem; font-weight:600; }
+  .theme { margin:0; font-size:clamp(2.5rem, 1.2rem + 6vw, 5.6rem); line-height:.98; font-weight:800; font-stretch:78%;
+           letter-spacing:-.035em; text-wrap:balance; }
+  .summary { margin:18px 0 0; max-width:58ch; font-size:1.15rem; }
+  .actions { margin-top:22px; display:flex; flex-wrap:wrap; gap:10px; }
+  .invite { background:var(--sun); border:2px solid var(--ink); border-radius:18px; padding:26px 26px 24px; position:relative; }
+  .invite::before { content:""; position:absolute; inset:8px; border:2px dashed rgba(27,19,64,.45); border-radius:12px; pointer-events:none; }
+  .invite h3 { margin:0 0 8px; font-size:1.3rem; font-weight:800; font-stretch:85%; }
+  .invite p { margin:0; font-size:1.12rem; position:relative; }
+
+  .block { margin-top:clamp(44px,7vw,80px); border-top:2px solid var(--ink); padding-top:22px; }
+  .block h3 { margin:0 0 20px; font-size:clamp(1.8rem, 1.2rem + 2vw, 2.7rem); line-height:1.05; font-weight:800; font-stretch:82%; letter-spacing:-.025em; }
+
+  /* Budget */
+  .money { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 18px; margin-bottom:18px; }
+  .total { margin:0; font-size:clamp(2.6rem,1.5rem + 4vw,4.4rem); font-weight:800; font-stretch:80%; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums; }
+  .per { margin:0; font-size:1.15rem; color:var(--ink-2); font-weight:600; }
+  .ribbon { display:flex; height:64px; border:2px solid var(--ink); border-radius:16px; overflow:hidden; background:var(--paper-2); }
+  .seg { flex:none; width:0; min-width:0; background:var(--c); border-right:2px solid var(--ink); display:flex; align-items:center;
+         padding-inline:12px; overflow:hidden; white-space:nowrap; font-weight:700; font-size:.92rem;
+         transition:width .9s cubic-bezier(.2,.8,.2,1) var(--d,0s), opacity .15s; }
+  .seg:last-child { border-right:0; }
+  .seg.spare { background:repeating-linear-gradient(135deg, rgba(27,19,64,.22) 0 5px, transparent 5px 11px), var(--paper-2); }
+  .seg span { overflow:hidden; text-overflow:ellipsis; }
+  .ribbon.dim .seg:not(.hl) { opacity:.35; }
+  .legend { list-style:none; margin:22px 0 0; padding:0; display:grid; gap:0 40px; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); }
+  .legend li { display:grid; grid-template-columns:18px 1fr auto 44px; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(27,19,64,.2); }
+  .legend li.hl { background:var(--paper-2); }
+  .chip { width:18px; height:18px; border-radius:6px; background:var(--c); border:2px solid var(--ink); }
+  .chip.spare { background:repeating-linear-gradient(135deg, rgba(27,19,64,.4) 0 3px, var(--paper-2) 3px 6px); }
+  .amt { font-weight:700; font-variant-numeric:tabular-nums; }
+  .pc { color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums; }
+
+  /* Timeline + ideas */
+  .split { display:grid; gap:0 56px; grid-template-columns:minmax(0,5fr) minmax(0,6fr); }
+  .split > .block { min-width:0; }
+  .note { margin:0 0 16px; padding:10px 14px; background:var(--peach); border:2px solid var(--ink); border-radius:12px; font-weight:600; font-size:.95rem; }
+  .steps { list-style:none; margin:0; padding:0; position:relative; }
+  .steps::before { content:""; position:absolute; left:112px; top:12px; bottom:12px; width:3px; background:var(--ink); border-radius:2px; }
+  .step { position:relative; display:grid; grid-template-columns:96px 1fr; gap:0 34px; padding:9px 0; align-items:start; }
+  .step time { font-weight:700; font-size:.95rem; text-align:right; padding-top:2px; font-variant-numeric:tabular-nums; }
+  .step p { margin:0; padding-top:2px; }
+  .step::after { content:""; position:absolute; left:104px; top:13px; width:19px; height:19px; border-radius:50%;
+                 background:var(--paper); border:3px solid var(--ink); }
+  .step.event { margin-block:6px; }
+  .step.event::after { background:var(--hot); }
+  .step.event p { font-weight:800; font-size:1.2rem; line-height:1.25; }
+  .step.event time { font-weight:800; }
+  .tag { display:inline-block; margin-left:8px; padding:0 9px; border-radius:999px; background:var(--mint); border:2px solid var(--ink);
+         font-size:.78rem; font-weight:700; vertical-align:middle; }
+  .ideas { display:grid; gap:14px; }
+  .idea { padding:18px 20px 20px; border:2px solid var(--ink); border-radius:18px; background:var(--c); }
+  .idea h4 { margin:0; font-size:1.3rem; font-weight:800; font-stretch:88%; letter-spacing:-.01em; line-height:1.2; }
+  .idea p { margin:6px 0 0; max-width:56ch; }
+  .cost { display:inline-block; margin-top:12px; padding:2px 12px; background:var(--ink); color:var(--paper); border-radius:999px; font-weight:600; font-size:.9rem; font-variant-numeric:tabular-nums; }
+  .tips h4 { margin:26px 0 6px; font-size:1.15rem; font-weight:800; }
+  .tips ul { margin:0; padding-left:1.2em; }
+  .tips li { margin:5px 0; max-width:60ch; }
+
+  /* Vendors */
+  .prog { display:flex; align-items:center; gap:14px; margin:0 0 24px; max-width:520px; font-weight:600; }
+  .bar { flex:1; height:12px; border:2px solid var(--ink); border-radius:999px; background:var(--paper-2); overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; background:var(--mint); transition:width .25s; }
+  .groups { columns:3 270px; column-gap:36px; }
+  .group { break-inside:avoid; margin:0 0 28px; padding:0; border:0; }
+  .gh { display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding-bottom:6px; border-bottom:2px solid var(--ink); margin-bottom:6px; }
+  .gh h4 { margin:0; font-size:1.15rem; font-weight:800; }
+  .gh span { font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .check { display:flex; align-items:flex-start; gap:10px; padding:5px 0; cursor:pointer; }
+  .check input { flex:none; width:20px; height:20px; margin:2px 0 0; accent-color:var(--hot); cursor:pointer; }
+  .check input:checked + span { text-decoration:line-through; text-decoration-thickness:2px; color:var(--ink-2); }
+
+  main { padding-bottom:64px; }
+  #confetti { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:20; }
+
+  @media (max-width: 860px) {
+    .lead, .split { grid-template-columns:minmax(0,1fr); }
+    .split { gap:0; }
+  }
+  @media (max-width: 520px) {
+    .steps::before { left:88px; }
+    .step { grid-template-columns:72px 1fr; gap:0 28px; }
+    .step::after { left:80px; }
+    .legend li { grid-template-columns:18px 1fr auto; }
+    .legend .pc { display:none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .seg, .bar i, .btn { transition:none; }
+  }
+  @media print {
+    body { background:#fff; }
+    .intro, .top, .actions, #confetti { display:none !important; }
+    * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .block, .invite, .idea, .group { break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<header class="top wrap"><span class="brand">Gather</span></header>
+
+<main>
+  <section class="intro wrap" id="intro">
+    <h1 class="sr">Plan your event</h1>
+    <p class="lede">Fill in the blanks, add a few details if you like, and get a budget, a timeline, a vendor checklist and ideas that fit.</p>
+
+    <form id="form" novalidate>
+      <p class="sentence">
+        <span class="plain">I'm planning a</span>
+        <label class="fill pick f1"><span class="mirror"></span>
+          <select id="ev-type" name="event_type" aria-label="Type of event">
+            <option value="birthday">birthday</option>
+            <option value="community">community event</option>
+            <option value="fundraiser">fundraiser</option>
+            <option value="workshop">workshop</option>
+            <option value="other">other</option>
+          </select></label>
+        <label class="fill f1" id="otherFill" hidden><span class="mirror"></span>
+          <input id="ev-other" name="other_type" type="text" maxlength="80" placeholder="specify, e.g. baby shower" autocomplete="off" aria-label="Specify the type of event"></label>
+        <span class="plain">called</span>
+        <label class="fill f2"><span class="mirror"></span>
+          <input id="ev-name" name="name" type="text" maxlength="120" placeholder="name it (optional)" autocomplete="off" aria-label="Event name"></label>
+        <span class="plain">on</span>
+        <span class="nowrap"><label class="fill date f3"><span class="mirror"></span>
+          <input id="ev-date" name="date" type="date" aria-label="Event date"></label><span class="plain">,</span></span>
+        <span class="plain">for</span>
+        <label class="fill f4"><span class="mirror"></span>
+          <input id="ev-guests" name="guests" type="number" min="1" max="5000" value="25" required inputmode="numeric" aria-label="Number of guests"></label>
+        <span class="plain">people with</span>
+        <label class="fill f5"><span class="mirror"></span>
+          <input id="ev-budget" name="budget" type="number" min="1" step="any" value="800" required inputmode="decimal" aria-label="Budget amount"></label>
+        <label class="fill pick small f6"><span class="mirror"></span>
+          <select name="currency" id="currency" aria-label="Currency"></select></label>
+        <span class="plain">to spend.</span>
+      </p>
+
+      <div class="details">
+        <label class="field wide">What's the vibe?
+          <input id="f-vibe" type="text" name="interests" maxlength="500" placeholder="Dinosaurs, craft table, lots of games" autocomplete="off"></label>
+        <label class="field wide">Anything we should plan around?
+          <textarea id="f-notes" name="notes" maxlength="800" rows="2" placeholder="Two guests have nut allergies. We need step-free access."></textarea></label>
+        <label class="field">Where is it?
+          <input id="f-location" type="text" name="location" maxlength="120" placeholder="City or venue" autocomplete="off"></label>
+        <label class="field">How old is the guest of honor?
+          <input id="f-age" type="number" name="honoree_age" min="0" max="120" placeholder="Leave blank if it doesn't apply"></label>
+        <fieldset class="seg3 field wide">
+          <legend>Indoors or outdoors?</legend>
+          <label><input id="io-either" type="radio" name="indoor_outdoor" value="either" checked><span>Either</span></label>
+          <label><input id="io-in" type="radio" name="indoor_outdoor" value="indoor"><span>Indoors</span></label>
+          <label><input id="io-out" type="radio" name="indoor_outdoor" value="outdoor"><span>Outdoors</span></label>
+        </fieldset>
+      </div>
+
+      <div class="go-row">
+        <button id="go" class="btn go" type="button">Make my plan</button>
+        <button class="btn clear-btn" type="button">Clear data</button>
+        <p id="status" class="status" role="status" hidden></p>
+        <p id="err" class="err" role="alert" hidden></p>
+      </div>
+    </form>
+  </section>
+
+  <section id="results" class="wrap" hidden aria-live="polite">
+    <div class="lead">
+      <div>
+        <p id="mode" class="mode"></p>
+        <h2 id="theme" class="theme"></h2>
+        <p id="summary" class="summary"></p>
+        <div class="actions">
+          <button class="btn" id="print" type="button">Print or save as PDF</button>
+          <button class="btn" id="edit" type="button">Change details</button>
+          <button class="btn" id="copy" type="button">Copy invitation</button>
+          <button class="btn clear-btn" type="button">Clear data</button>
+        </div>
+      </div>
+      <aside class="invite"><h3>Your invitation</h3><p id="invite"></p></aside>
+    </div>
+
+    <section class="block" id="budget-block">
+      <h3>Where the money goes</h3>
+      <div class="money" id="money"></div>
+      <div class="ribbon" id="ribbon" role="img" aria-label="Budget split across categories"></div>
+      <ul class="legend" id="legend"></ul>
+    </section>
+
+    <div class="split">
+      <section class="block"><h3>What happens when</h3><div id="timeline"></div></section>
+      <section class="block"><h3>Ideas to make it yours</h3><div class="ideas" id="ideas"></div>
+        <div class="tips"><h4>Good to know</h4><ul id="tips"></ul></div></section>
+    </div>
+
+    <section class="block">
+      <h3>Who to book and what to ask</h3>
+      <div class="prog"><span id="progtext"></span><div class="bar"><i id="progbar"></i></div></div>
+      <div class="groups" id="vendors"></div>
+    </section>
+  </section>
+</main>
+
+
+<script>
+/* If anything in the page's script fails, say so on the page instead of failing silently. */
+window.addEventListener("error", function (e) {
+  var box = document.getElementById("err"); if (!box) return;
+  box.textContent = "Page error: " + (e.message || "unknown") + (e.lineno ? " (line " + e.lineno + ")" : "") + ". Reload the page. If it keeps happening, send this message to the person who built it.";
+  box.hidden = false;
+});
+window.addEventListener("unhandledrejection", function (e) {
+  var box = document.getElementById("err"); if (!box) return;
+  box.textContent = "Page error: " + ((e.reason && e.reason.message) || e.reason || "unknown") + ". Reload the page and try again."; box.hidden = false;
+});
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const USE_SERVER = true;   // the hosted copy sets this to false: no server there
+let CUR = "USD", DEFAULT_CUR = "USD";
+const money = n => {
+  try { return new Intl.NumberFormat(undefined, {style:"currency", currency:CUR, minimumFractionDigits:0, maximumFractionDigits:2}).format(n); }
+  catch { return Number(n).toLocaleString(undefined, {maximumFractionDigits:2}) + " " + CUR; }
+};
+const COLORS = ["var(--pink)","var(--sun)","var(--mint)","var(--sky)","var(--lilac)","var(--peach)","var(--lime)","var(--aqua)"];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const localISO = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const todayISO = localISO(new Date());
+
+/* Currency dropdown: every active ISO 4217 currency, named in the visitor's language. */
+const CODES = ("AED AFN ALL AMD ANG AOA ARS AUD AWG AZN BAM BBD BDT BGN BHD BIF BMD BND BOB BRL BSD BTN BWP BYN BZD CAD CDF CHF CLP CNY COP CRC CUP CVE CZK DJF DKK DOP DZD EGP ERN ETB EUR FJD FKP GBP GEL GHS GIP GMD GNF GTQ GYD HKD HNL HTG HUF IDR ILS INR IQD IRR ISK JMD JOD JPY KES KGS KHR KMF KPW KRW KWD KYD KZT LAK LBP LKR LRD LSL LYD MAD MDL MGA MKD MMK MNT MOP MRU MUR MVR MWK MXN MYR MZN NAD NGN NIO NOK NPR NZD OMR PAB PEN PGK PHP PKR PLN PYG QAR RON RSD RUB RWF SAR SBD SCR SDG SEK SGD SHP SLE SOS SRD SSP STN SVC SYP SZL THB TJS TMT TND TOP TRY TTD TWD TZS UAH UGX USD UYU UZS VES VND VUV WST XAF XCD XOF XPF YER ZAR ZMW ZWG").split(" ");
+(function () {
+  let dn = null; try { dn = new Intl.DisplayNames(undefined, {type:"currency"}); } catch {}
+  const items = CODES.map(c => { let n = c; try { n = (dn && dn.of(c)) || c; } catch {} return {c, n, label: n === c ? c : n + " (" + c + ")"}; })
+    .sort((a, b) => a.n.localeCompare(b.n));
+  const sel = $("#currency");
+  sel.innerHTML = items.map(i => `<option value="${i.c}">${esc(i.label)}</option>`).join("");
+  const region = ((navigator.language || "en-US").split("-")[1] || "").toUpperCase();
+  const guess = {US:"USD",GB:"GBP",IN:"INR",CA:"CAD",AU:"AUD",NZ:"NZD",JP:"JPY",CN:"CNY",HK:"HKD",SG:"SGD",KR:"KRW",
+    DE:"EUR",FR:"EUR",ES:"EUR",IT:"EUR",NL:"EUR",IE:"EUR",PT:"EUR",BE:"EUR",AT:"EUR",FI:"EUR",GR:"EUR",
+    MX:"MXN",BR:"BRL",AR:"ARS",CL:"CLP",CO:"COP",ZA:"ZAR",NG:"NGN",KE:"KES",GH:"GHS",EG:"EGP",AE:"AED",SA:"SAR",
+    PK:"PKR",BD:"BDT",LK:"LKR",PH:"PHP",ID:"IDR",MY:"MYR",TH:"THB",VN:"VND",TR:"TRY",CH:"CHF",SE:"SEK",NO:"NOK",
+    DK:"DKK",PL:"PLN",CZ:"CZK",HU:"HUF",RO:"RON",UA:"UAH",RU:"RUB",IL:"ILS"}[region] || "USD";
+  DEFAULT_CUR = CODES.includes(guess) ? guess : "USD";
+  sel.value = DEFAULT_CUR; CUR = DEFAULT_CUR;
+})();
+
+/* Fill-in-the-blank fields grow with their content. */
+const syncers = [];
+document.querySelectorAll(".fill").forEach(f => {
+  const el = f.querySelector("input, select"), m = f.querySelector(".mirror");
+  const sync = () => {
+    let t = "";
+    if (el.tagName === "SELECT") t = el.options[el.selectedIndex].text;
+    else if (el.type === "date") t = "mm/dd/yyyy";
+    else t = el.value || el.placeholder || "";
+    m.textContent = t || " ";
+  };
+  el.addEventListener("input", sync); el.addEventListener("change", sync); sync(); syncers.push(sync);
+  f.addEventListener("click", e => { if (e.target === f) el.focus(); });
+});
+$("[name=date]").min = todayISO;
+
+/* "Other" reveals a blank to say what kind of event it is. */
+const typeSel = $("[name=event_type]"), otherFill = $("#otherFill"), otherInput = otherFill.querySelector("input");
+typeSel.addEventListener("change", () => {
+  const on = typeSel.value === "other";
+  otherFill.hidden = !on;
+  if (on) otherInput.focus();
+});
+
+/* In-page planner: the same budget, timeline, vendor and idea logic as app.py, so the button
+   works even when the server is down, out of date, or the page is opened straight from disk. */
+const PD = {"BUDGET":{"birthday":{"Venue":0.2,"Food & drink":0.35,"Cake & desserts":0.08,"Decor & balloons":0.1,"Entertainment / activities":0.12,"Invitations & favors":0.05,"Contingency":0.1},"community":{"Venue & permits":0.15,"Food & drink":0.25,"Entertainment & speakers":0.15,"Equipment & AV":0.12,"Marketing & printing":0.1,"Insurance & safety":0.08,"Supplies & signage":0.07,"Contingency":0.08},"fundraiser":{"Venue":0.18,"Food & drink":0.28,"Auction / raffle items":0.1,"Entertainment":0.12,"Marketing & printing":0.1,"Payment & admin fees":0.05,"Decor & signage":0.07,"Contingency":0.1},"workshop":{"Venue":0.25,"Facilitator / speaker":0.25,"Materials & supplies":0.15,"Refreshments":0.15,"Marketing":0.08,"AV & tech":0.05,"Contingency":0.07},"other":{"Venue":0.22,"Food & drink":0.3,"Entertainment & activities":0.13,"Decor & supplies":0.1,"Marketing & invitations":0.08,"Equipment & AV":0.07,"Contingency":0.1}},"TIMELINE":{"birthday":[[42,"Set budget, date and guest list"],[35,"Pick theme and book venue"],[28,"Book key vendors (caterer, entertainer, photographer)"],[21,"Send invitations"],[14,"Order cake and decor; plan menu and activities"],[7,"Confirm RSVPs and dietary needs; buy supplies and favors"],[3,"Confirm vendors and delivery times; prep playlist and schedule"],[1,"Set up venue, pick up cake and ice"],[0,"Event day: run schedule, take photos"],[-2,"Send thank-yous and settle final vendor payments"]],"community":[[84,"Define goals, committee roles and budget"],[70,"Secure venue, date and permits"],[56,"Recruit sponsors, vendors and volunteers"],[42,"Confirm insurance and safety plan"],[35,"Launch promotion: social, flyers, local partners"],[21,"Finalize program, schedule and vendor layout"],[14,"Brief volunteers; confirm equipment and AV"],[7,"Final headcount, signage, weather plan"],[1,"Load-in and setup walkthrough"],[0,"Event day: check-in, run program, collect feedback"],[-3,"Thank sponsors/volunteers; publish recap and reconcile budget"]],"fundraiser":[[90,"Set fundraising goal, committee and budget"],[75,"Book venue and secure licenses"],[60,"Solicit auction/raffle donations and sponsors"],[42,"Open ticket sales and donation page"],[28,"Promote with email, social and press"],[14,"Finalize program, MC and donor recognition"],[7,"Confirm attendance and volunteers; print bid sheets"],[1,"Setup and payment test"],[0,"Event day: run program and make the ask"],[-3,"Send receipts, thank donors, report results"]],"workshop":[[56,"Define learning goals and audience"],[42,"Book facilitator and venue"],[35,"Open registration and promote"],[21,"Finalize agenda and materials list"],[10,"Order or print materials"],[5,"Confirm attendees; send logistics email"],[1,"Room setup and tech check"],[0,"Workshop day"],[-2,"Send follow-up resources and survey"]],"other":[[56,"Define the purpose, guest list and budget"],[42,"Pick the date and book the venue"],[28,"Book key vendors and any speakers or performers"],[21,"Send invitations or open registration"],[14,"Finalize menu, program and supplies"],[7,"Confirm headcount and special requirements"],[2,"Confirm vendor arrival times and run through the schedule"],[1,"Set up and do a walkthrough"],[0,"Event day"],[-2,"Thank guests and helpers; settle payments"]]},"VENDORS":{"Venue":["Total cost incl. fees and deposit","Capacity, rain plan and accessibility","Setup/cleanup time and rules"],"Venue & permits":["Permit and noise/alcohol rules","Capacity and accessibility","Deposit and cancellation terms"],"Food & drink":["Per-head price and minimums","Dietary options (veg, vegan, allergens)","Serving staff, plates, cleanup"],"Cake & desserts":["Flavors, allergen info, serving count","Pickup/delivery time","Order lead time"],"Decor & balloons":["Theme palette and delivery vs DIY","Setup/teardown help","Venue rules on tape or helium"],"Entertainment / activities":["Age-appropriate content and duration","Equipment and space needs","Backup if they cancel"],"Entertainment & speakers":["Fee, travel and tech riders","Run time and soundcheck slot","Signed agreement"],"Entertainment":["Fee and set length","Power and stage needs","Signed agreement"],"Invitations & favors":["Digital vs printed, RSVP tracking","Favor count (+10%)","Delivery date"],"Equipment & AV":["Mics, speakers, projector, power","Tables, chairs, tents count","Tech on site during event"],"AV & tech":["Projector/screen/mic check","Wi-Fi and power access","Tech contact on the day"],"Marketing & printing":["Flyer/poster proofs","Social and local listings","Print turnaround"],"Marketing":["Registration page and reminders","Flyer/social assets","Partner cross-promotion"],"Insurance & safety":["Event liability coverage","First aid and safety lead","Crowd and emergency plan"],"Supplies & signage":["Wayfinding and welcome signs","Trash, recycling, restrooms","Volunteer vests/badges"],"Auction / raffle items":["Donor letters and tax receipts","Item values and starting bids","Display and checkout plan"],"Payment & admin fees":["Card processing fees","Ticketing platform terms","Receipts for donors"],"Decor & signage":["Branding and donation signage","Table centerpieces","Setup help"],"Facilitator / speaker":["Fee, expenses, and agenda","Materials they provide","Cancellation terms"],"Materials & supplies":["Quantity (+10% spare)","Delivery date","Handouts and name tags"],"Refreshments":["Coffee/tea/water and snacks","Dietary options","Setup and cleanup"],"Entertainment & activities":["Fit for the guests and the occasion","Equipment and space needs","Backup if they cancel"],"Decor & supplies":["Theme palette and delivery vs DIY","Setup and teardown help","Venue rules on what you can hang or light"],"Marketing & invitations":["Digital vs printed invitations","RSVP or registration tracking","Reminder schedule"],"Contingency":["Hold back for surprises; track spend weekly"]},"IDEAS":{"birthday":[["Signature activity station","A DIY station matched to the honoree's interests (cookie decorating, crafts, trivia).",0.06],["Memory wall","Guests add photos and notes to a wall or jar for the honoree to keep.",0.02],["Themed food table","Build the menu around one theme with labeled dishes and a standout dessert.",0.12],["Group moment","A scheduled toast, song or game so everyone shares the highlight.",0.01]],"community":[["Local maker market corner","Invite neighborhood crafters and food vendors for a small fee or donation.",0.05],["Kids' activity zone","Chalk art, a scavenger hunt and a volunteer-run games table.",0.04],["Story or talent stage","Open-mic slots for residents, with a short MC-led schedule.",0.06],["Neighbor connection board","A board for skills, needs and volunteer sign-ups to extend the event's impact.",0.01]],"fundraiser":[["Silent auction with local donors","Businesses donate experiences; display with clear bid sheets.",0.08],["Matching-gift moment","A sponsor pledges to match donations made during a set window.",0.01],["Impact story","A beneficiary shares a short story before the ask.",0.01],["Raffle bundles","Themed baskets sold in tiers to raise small donations.",0.04]],"workshop":[["Hands-on first 15 minutes","Start with an activity so attendees produce something early.",0.02],["Peer showcase","End with 2-minute shares to cement learning.",0.01],["Take-home kit","A one-page guide plus a small tool or template.",0.05],["Follow-up circle","Create a group chat or monthly meetup for continued support.",0.01]],"other":[["One signature moment","Pick a single highlight (a toast, a reveal, a performance) and build the schedule around it.",0.08],["Welcome touch","A greeter, a signature drink or a small keepsake as guests arrive.",0.03],["Shared memory table","Photos, notes or a guest book that guests add to during the event.",0.02],["Easy interactive activity","A low-effort game or station so guests mingle without needing instructions.",0.05]]}};
+const round2 = x => Math.round((x + Number.EPSILON) * 100) / 100;
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function localPlan(body) {
+  const et = PD.BUDGET[body.event_type] ? body.event_type : "birthday";
+  const guests = body.guests, total = body.budget, cur = String(body.currency || "USD").toUpperCase();
+  const label = et === "other" ? ((body.other_type || "").trim() || "event") : et;
+  const interests = (body.interests || "").trim(), notes = body.notes || "";
+
+  const shares = PD.BUDGET[et], cats = Object.keys(shares); let running = 0;
+  const items = cats.map((cat, i) => {
+    const amount = i < cats.length - 1 ? round2(total * shares[cat]) : round2(total - running);
+    running += amount;
+    return {category: cat, amount, percent: Math.round(shares[cat] * 100)};
+  });
+  const budget = {total: round2(total), per_guest: round2(total / guests), items};
+
+  const steps = PD.TIMELINE[et]; let timeline;
+  if (!body.date) {
+    timeline = {event_date: null, compressed: false, steps: steps.map(([d, task]) =>
+      ({when: d > 0 ? d + " days before" : d === 0 ? "Event day" : (-d) + " days after", date: null, task}))};
+  } else {
+    const [y, m, dd] = body.date.split("-").map(Number), ev = new Date(y, m - 1, dd);
+    const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const daysUntil = Math.round((ev - today) / 86400000);
+    const maxLead = Math.max(...steps.map(s => s[0]));
+    const factor = daysUntil >= maxLead ? 1 : Math.max(daysUntil, 0) / maxLead;
+    timeline = {event_date: body.date, days_until: daysUntil, compressed: factor < 1, steps: steps.map(([d, task]) => {
+      const shifted = d > 0 ? Math.round(d * factor) : d, w = new Date(y, m - 1, dd - shifted);
+      return {when: DAYS[w.getDay()] + " " + MONTHS[w.getMonth()] + " " + String(w.getDate()).padStart(2, "0"), date: localISO(w), task};
+    })};
+  }
+
+  const vendors = items.filter(i => i.category !== "Contingency").map(i => ({category: i.category, budget: i.amount,
+    checklist: PD.VENDORS[i.category] || ["Get a written quote", "Confirm date and delivery"]}));
+
+  const ideas = PD.IDEAS[et].map(([title, description, share]) => ({title, description, est_cost: round2(total * share)}));
+  const tips = ["Confirm headcount one week out and plan for about 10% no-shows or extras.",
+                "Book the highest-demand vendors first (venue, caterer, entertainment)."];
+  if (notes) tips.push("Build this into every vendor conversation: " + notes.slice(0, 120));
+  if ((body.indoor_outdoor || "either") !== "indoor") tips.push("For outdoor elements, keep a covered backup space or a weather date.");
+  const parts = interests.split(/[,;]/).map(s => s.trim()).filter(Boolean).slice(0, 2);
+  let theme = parts.join(" & ").slice(0, 40).trimEnd();
+  theme = theme ? theme.charAt(0).toUpperCase() + theme.slice(1) : "Classic & cozy";
+  const fmt = (n, f) => n.toLocaleString("en-US", {minimumFractionDigits: f, maximumFractionDigits: f});
+  return {mode: "local", event_type: et, event_label: label, currency: cur, name: body.name || "",
+    personalized: {theme,
+      summary: "A " + label + " for " + guests + " guests with " + fmt(total, 0) + " " + cur + " to spend (about " + fmt(budget.per_guest, 2) + " " + cur +
+               " per guest), " + (interests ? "built around " + interests + "." : "with a welcoming, easygoing feel."),
+      ideas, tips: tips.slice(0, 4),
+      invitation: "You're invited to " + (body.name || "your " + label) + "! Join us for good company and a great time. Please RSVP so we can plan for everyone."},
+    budget, timeline, vendors};
+}
+
+/* Submit */
+let inflight = null, hasPlan = false;
+async function makePlan() {
+  if ($("#go").disabled) return;
+  const err = $("#err"); err.hidden = true;
+  const body = {};
+  for (const [k, v] of new FormData($("#form")).entries()) if (String(v).trim() !== "") body[k] = String(v).trim();
+  ["guests","budget","honoree_age"].forEach(k => { if (body[k] !== undefined) body[k] = Number(body[k]); });
+  if (body.event_type !== "other") delete body.other_type;
+  else if (!body.other_type) {
+    err.textContent = "Say what kind of event this is, like baby shower or reunion."; err.hidden = false; otherInput.focus(); return;
+  }
+  if (!(body.guests >= 1) || !(body.budget > 0)) {
+    err.textContent = "Add at least 1 guest and a budget above 0, then try again."; err.hidden = false; return;
+  }
+
+  const btn = $("#go"), status = $("#status");
+  const ctl = inflight = new AbortController();
+  let timedOut = false, cancelled = false, secs = 0;
+  const limit = setTimeout(() => { timedOut = true; ctl.abort(); }, 60000);
+  btn.disabled = true; btn.textContent = "Planning… 0s";
+  const tick = setInterval(() => {
+    secs++; btn.textContent = "Planning… " + secs + "s";
+    if (secs === 6) { status.textContent = "Still working. An AI model on your computer can take up to a minute. If it takes longer, you'll get the built-in plan instead."; status.hidden = false; }
+  }, 1000);
+  try {
+    let data = null;
+    // 1. Ask the server (it can add AI personalization). Skipped when the page is opened as a file.
+    if (USE_SERVER && location.protocol !== "file:") {
+      try {
+        const r = await fetch("/api/plan", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body), signal:ctl.signal});
+        if (r.ok) { const j = await r.json(); if (j && j.personalized && j.budget && j.timeline && j.vendors) data = j; }
+      } catch (ex) { if (ex.name === "AbortError" && !timedOut) cancelled = true; }
+    }
+    // 2. No usable server answer: build the plan right here in the page.
+    if (!cancelled) {
+      if (!data) data = localPlan(body);
+      const rect = btn.getBoundingClientRect();
+      render(data); hasPlan = true;
+      burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
+  } catch (ex) {
+    err.textContent = "Couldn't show the plan: " + (ex && ex.message ? ex.message : ex) + ". Try Clear data, then make the plan again.";
+    err.hidden = false;
+    console.error(ex);
+  } finally {
+    clearTimeout(limit); clearInterval(tick);
+    if (inflight === ctl) inflight = null;
+    status.hidden = true;
+    btn.disabled = false; btn.textContent = hasPlan ? "Update my plan" : "Make my plan";
+  }
+}
+/* A click handler, not a form submit: preview panes block form submission, which silently kills a submit button. */
+$("#go").addEventListener("click", makePlan);
+$("#form").addEventListener("submit", e => { e.preventDefault(); makePlan(); });
+$("#form").addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type !== "radio" && e.target.type !== "checkbox") { e.preventDefault(); makePlan(); }
+});
+
+/* Two views, so the result never depends on scrolling: the form, or the plan. */
+function showView(name) {
+  const plan = name === "plan";
+  $("#intro").hidden = plan; $("#results").hidden = !plan;
+  try { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch {}
+  if (plan) { const t = $("#theme"); t.tabIndex = -1; t.focus({preventScroll: true}); }
+}
+$("#edit").addEventListener("click", () => { showView("form"); typeSel.focus({preventScroll: true}); });
+
+/* Clear data: empties the form and the plan, and cancels a plan that is still being made. */
+function clearAll() {
+  if (inflight) { inflight.abort(); inflight = null; }
+  $("#form").reset();
+  $("#currency").value = DEFAULT_CUR; CUR = DEFAULT_CUR;
+  otherFill.hidden = true;
+  syncers.forEach(s => s());
+  $("#err").hidden = true; $("#status").hidden = true;
+  ["money","ribbon","legend","timeline","ideas","tips","vendors"].forEach(id => $("#" + id).innerHTML = "");
+  ["mode","theme","summary","invite","progtext"].forEach(id => $("#" + id).textContent = "");
+  $("#progbar").style.width = "0";
+  $("#ribbon").classList.remove("dim");
+  const copy = $("#copy"); copy.onclick = null; copy.textContent = "Copy invitation";
+  showView("form");
+  hasPlan = false;
+  const btn = $("#go"); btn.disabled = false; btn.textContent = "Make my plan";
+  const c = $("#confetti"); c.getContext("2d").clearRect(0, 0, c.width, c.height);
+  window.scrollTo({top: 0, behavior: reduce ? "auto" : "smooth"});
+  typeSel.focus({preventScroll: true});
+}
+document.querySelectorAll(".clear-btn").forEach(b => b.addEventListener("click", clearAll));
+
+/* Render */
+function render(d, quiet) {
+  const p = d.personalized, b = d.budget, t = d.timeline;
+  CUR = d.currency || CUR;
+  $("#mode").textContent = d.mode === "ai" ? "Personalized by AI" : d.mode === "local" ? (USE_SERVER ? "Built in your browser (planner server not reachable, so no AI ideas)" : "Built-in planner with template ideas") : "Built from templates (no AI model reachable)";
+  $("#theme").textContent = p.theme || "Your plan";
+  $("#summary").textContent = p.summary || "";
+  $("#invite").textContent = p.invitation || "";
+  $("#copy").onclick = async ev => {
+    const btn = ev.currentTarget;
+    try { await navigator.clipboard.writeText(p.invitation || ""); btn.textContent = "Copied"; }
+    catch { try { const r = document.createRange(); r.selectNodeContents($("#invite")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } catch {} btn.textContent = "Press Ctrl+C to copy"; }
+    setTimeout(() => btn.textContent = "Copy invitation", 1700);
+  };
+
+  // Budget
+  $("#money").innerHTML = `<p class="total">${money(b.total)}</p><p class="per">${money(b.per_guest)} per guest</p>`;
+  const ribbon = $("#ribbon");
+  ribbon.classList.remove("dim");
+  ribbon.innerHTML = b.items.map((it, i) => {
+    const w = it.amount / b.total * 100, spare = it.category === "Contingency";
+    return `<div class="seg ${spare ? "spare" : ""}" data-i="${i}" data-w="${w}" style="--c:${COLORS[i % COLORS.length]};--d:${i*0.07}s" title="${esc(it.category)}: ${money(it.amount)}"><span>${w >= 12 ? esc(it.category) : ""}</span></div>`;
+  }).join("");
+  $("#legend").innerHTML = b.items.map((it, i) => {
+    const spare = it.category === "Contingency";
+    return `<li data-i="${i}"><i class="chip ${spare ? "spare" : ""}" style="--c:${COLORS[i % COLORS.length]}"></i><span>${esc(it.category)}</span><span class="amt">${money(it.amount)}</span><span class="pc">${it.percent}%</span></li>`;
+  }).join("");
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    ribbon.querySelectorAll(".seg").forEach(s => s.style.width = s.dataset.w + "%")));
+
+  // Timeline
+  let note = "";
+  if (t.compressed) note = `<p class="note">Your date is ${t.days_until} days away, so the lead times are squeezed. Book the big things first.</p>`;
+  else if (!t.event_date) note = `<p class="note">Pick a date and each step gets a real calendar day.</p>`;
+  $("#timeline").innerHTML = note + `<ol class="steps">` + t.steps.map(s => {
+    const isEvent = (s.date && s.date === t.event_date) || s.when === "Event day";
+    const isToday = s.date === todayISO;
+    return `<li class="step ${isEvent ? "event" : ""}"><time>${esc(s.when)}</time><p>${esc(s.task)}${isToday ? '<span class="tag">today</span>' : ""}</p></li>`;
+  }).join("") + `</ol>`;
+
+  // Ideas + tips
+  const tint = ["var(--sun)","var(--mint)","var(--sky)","var(--pink)","var(--lilac)","var(--peach)"];
+  $("#ideas").innerHTML = p.ideas.map((x, i) => `<article class="idea" style="--c:${tint[i % tint.length]}"><h4>${esc(x.title)}</h4>
+    <p>${esc(x.description)}</p><span class="cost">about ${money(x.est_cost)}</span></article>`).join("");
+  $("#tips").innerHTML = (p.tips || []).map(x => `<li>${esc(x)}</li>`).join("");
+
+  // Vendors
+  $("#vendors").innerHTML = d.vendors.map((v, vi) => `<fieldset class="group" data-g="${vi}">
+    <div class="gh"><h4>${esc(v.category)}</h4><span>${money(v.budget)}</span></div>` +
+    v.checklist.map((c, ci) => `<label class="check"><input type="checkbox"><span>${esc(c)}</span></label>`).join("") + `</fieldset>`).join("");
+  updateProgress();
+
+  showView("plan");
+}
+
+function updateProgress() {
+  const all = document.querySelectorAll("#vendors input"), done = document.querySelectorAll("#vendors input:checked");
+  $("#progtext").textContent = done.length + " of " + all.length + " confirmed";
+  $("#progbar").style.width = (all.length ? done.length / all.length * 100 : 0) + "%";
+}
+$("#vendors").addEventListener("change", updateProgress);
+$("#print").addEventListener("click", () => window.print());
+
+/* Highlight a budget category from the ribbon or the legend */
+const budgetBlock = $("#budget-block");
+function hl(i) {
+  const rb = $("#ribbon");
+  rb.classList.toggle("dim", i !== null);
+  rb.querySelectorAll(".seg").forEach(s => s.classList.toggle("hl", s.dataset.i === i));
+  document.querySelectorAll("#legend li").forEach(l => l.classList.toggle("hl", l.dataset.i === i));
+}
+budgetBlock.addEventListener("pointerover", e => { const t = e.target.closest("[data-i]"); if (t) hl(t.dataset.i); });
+budgetBlock.addEventListener("pointerleave", () => hl(null));
+
+/* One confetti burst when a plan arrives */
+function burst(x, y) {
+  if (reduce) return;
+  const c = $("#confetti"), ctx = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
+  c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const cols = ["#FF8FB5","#FFD25A","#6FE3C1","#8FB0FF","#C9B8FF","#FF4F8B","#1B1340"];
+  const ps = Array.from({length: 110}, () => {
+    const a = -Math.PI / 2 + (Math.random() - .5) * 2.4, s = 6 + Math.random() * 11;
+    return {x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, w: 6 + Math.random() * 7, h: 4 + Math.random() * 5,
+            r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cols[Math.floor(Math.random() * cols.length)]};
+  });
+  const t0 = performance.now();
+  (function tick(now) {
+    const k = now - t0;
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ps.forEach(p => {
+      p.vy += .28; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.globalAlpha = Math.max(0, 1 - k / 2400); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+    });
+    if (k < 2400) requestAnimationFrame(tick); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+  })(t0);
+}
+</script>
+</body>
+</html>
