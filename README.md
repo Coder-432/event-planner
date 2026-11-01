@@ -113,21 +113,8 @@ gather-event-planner/
 └── docs/preview.png
 ```
 
-## Notes for contributors
 
-- The planner data (budget shares, timelines, vendor questions, template ideas) lives in `app.py`
-  and is duplicated in `index.html` so the page works without a server. If you change one,
-  change the other.
-- Preview panes and some embedded viewers block form submission, so the button uses a click
-  handler instead of a form submit.
 
-## Ideas for next steps
 
-- Save and reopen plans (SQLite)
-- Track actual spend against each budget line
-- Export the timeline to a calendar file (.ics)
-- A chat box for changes, such as "swap the entertainment and keep it under 100"
 
-## License
 
-Add a license before publishing if you want others to reuse the code (MIT is a common choice).
